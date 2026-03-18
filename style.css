@@ -1,0 +1,315 @@
+/* ===== Reset & Base ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #0a0a1a;
+  color: #fff;
+  font-family: 'Segoe UI', 'Meiryo', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+#app {
+  width: 640px;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ===== Screens ===== */
+.screen {
+  display: none;
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.4s ease;
+}
+
+.screen.active {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Title Screen ===== */
+.title-logo {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.title-text {
+  font-size: 3.2rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+  text-shadow: 0 0 20px #ff4466, 0 0 40px #ff4466;
+  color: #fff;
+}
+
+.title-army {
+  color: #ff4466;
+}
+
+.title-sub {
+  font-size: 1.1rem;
+  letter-spacing: 8px;
+  color: #aaa;
+  margin-top: 4px;
+}
+
+.title-deco {
+  display: flex;
+  gap: 16px;
+  font-size: 2rem;
+  margin: 30px 0;
+  animation: march 2s infinite alternate;
+}
+
+@keyframes march {
+  from { transform: translateX(-10px); }
+  to   { transform: translateX(10px); }
+}
+
+.title-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 280px;
+}
+
+/* ===== Buttons ===== */
+.menu-btn {
+  padding: 14px 30px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border: 2px solid #ff4466;
+  background: transparent;
+  color: #ff4466;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 2px;
+}
+
+.menu-btn:hover {
+  background: #ff4466;
+  color: #fff;
+  box-shadow: 0 0 16px #ff4466;
+}
+
+.action-btn {
+  padding: 8px 18px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border: 2px solid #44aaff;
+  background: transparent;
+  color: #44aaff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  background: #44aaff;
+  color: #fff;
+}
+
+/* ===== Help Screen ===== */
+#help-screen {
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 40px 30px;
+}
+
+#help-screen h2 {
+  font-size: 1.8rem;
+  color: #ff4466;
+  margin-bottom: 20px;
+  align-self: center;
+}
+
+.help-list {
+  list-style: none;
+  width: 100%;
+  max-width: 560px;
+  line-height: 2;
+  font-size: 1rem;
+  color: #ccc;
+}
+
+.help-list > li {
+  margin-bottom: 8px;
+}
+
+.help-list ul {
+  list-style: none;
+  padding-left: 20px;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+#btn-help-back {
+  margin-top: 30px;
+  align-self: center;
+}
+
+/* ===== Game Screen ===== */
+#game-screen {
+  justify-content: flex-start;
+  padding: 10px 0;
+  gap: 8px;
+}
+
+/* Top Bar */
+#top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 8px 12px;
+  background: #11112a;
+  border-bottom: 2px solid #333;
+}
+
+.team-info {
+  font-size: 0.85rem;
+  color: #aaa;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.team-label {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.player-team .team-label { color: #44aaff; }
+.enemy-team .team-label  { color: #ff4466; }
+
+.hp-bar-wrap {
+  display: block;
+  width: 100px;
+  height: 6px;
+  background: #333;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.hp-bar {
+  display: block;
+  height: 100%;
+  width: 100%;
+  border-radius: 3px;
+  transition: width 0.4s;
+}
+
+.player-team .hp-bar { background: #44aaff; }
+.enemy-team  .hp-bar { background: #ff4466; }
+
+#turn-info {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #ddd;
+}
+
+.phase-player { color: #44aaff; font-weight: 700; }
+.phase-enemy  { color: #ff4466; font-weight: 700; }
+
+/* Map */
+#map-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#game-canvas {
+  border: 2px solid #333;
+  cursor: pointer;
+  image-rendering: pixelated;
+}
+
+/* Bottom Bar */
+#bottom-bar {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 12px;
+}
+
+#unit-detail {
+  font-size: 0.9rem;
+  color: #ccc;
+  background: #11112a;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #333;
+  min-height: 36px;
+}
+
+#action-btns {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+#log-area {
+  height: 60px;
+  overflow-y: auto;
+  background: #0d0d22;
+  border: 1px solid #222;
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+
+#battle-log {
+  font-size: 0.8rem;
+  color: #aaa;
+  line-height: 1.6;
+}
+
+#battle-log .log-attack  { color: #ffaa44; }
+#battle-log .log-move    { color: #44aaff; }
+#battle-log .log-destroy { color: #ff4466; }
+#battle-log .log-enemy   { color: #ff8888; }
+
+/* ===== Result Screen ===== */
+#result-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+#result-title {
+  font-size: 3rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+}
+
+#result-title.win  { color: #44ff88; text-shadow: 0 0 20px #44ff88; }
+#result-title.lose { color: #ff4466; text-shadow: 0 0 20px #ff4466; }
+
+#result-message {
+  font-size: 1.1rem;
+  color: #bbb;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 660px) {
+  #app { width: 100vw; }
+  #game-canvas { width: 100vw; height: 100vw; }
+}

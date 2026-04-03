@@ -7,99 +7,169 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="app">
-    <!-- Title Screen -->
-    <div id="title-screen" class="screen active">
-      <div class="title-logo">
-        <h1 class="title-text">ビビッド<span class="title-army">アーミー</span></h1>
-        <p class="title-sub">VIVID ARMY</p>
+<div id="app">
+
+  <!-- ==================== タイトル ==================== -->
+  <div id="title-screen" class="screen active">
+    <div class="title-logo">
+      <h1 class="title-text">ビビッド<span class="title-army">アーミー</span></h1>
+      <p class="title-sub">VIVID ARMY</p>
+    </div>
+    <div class="title-deco">
+      <span>🪖</span><span>🪖</span><span>🪖</span>
+      <span>🚢</span><span>✈️</span><span>✈️</span>
+    </div>
+    <div class="title-menu">
+      <button class="menu-btn" id="btn-start">ゲームスタート</button>
+      <button class="menu-btn" id="btn-help">遊び方</button>
+    </div>
+  </div>
+
+  <!-- ==================== ヘルプ ==================== -->
+  <div id="help-screen" class="screen">
+    <h2 class="help-title">遊び方</h2>
+    <ul class="help-list">
+      <li>⚙️ ゴールドを使って兵士を生産しましょう</li>
+      <li>✨ 同じ種類・同じレベルのユニットをドラッグ&amp;ドロップで合成！</li>
+      <li>🎯 クリックでユニットを選択（青枠 = 出撃選択）</li>
+      <li>🗺️ 「世界マップへ」で進軍先を選択</li>
+      <li>⚔️ 敵領地を選び「攻撃進軍」→赤いラインで進軍アニメーション</li>
+      <li>🪙 占領済み領地を選び「資源採集」→青いラインで採集</li>
+      <li>🔴 三すくみ：陸軍🪖→空軍✈️→海軍🚢→陸軍の順に有利</li>
+      <li>🔬 研究でより高レベルの合成を解禁！</li>
+      <li>⭐ 3連勝で英雄が仲間に！ 強力なボーナスをもたらします</li>
+      <li>🏆 全14領地を占領するとゲームクリア！</li>
+    </ul>
+    <button class="menu-btn" id="btn-help-back">戻る</button>
+  </div>
+
+  <!-- ==================== 基地画面 ==================== -->
+  <div id="base-screen" class="screen">
+    <!-- トップバー -->
+    <div class="top-bar" id="base-topbar">
+      <div class="res-group">
+        <span class="res-label">⚙️ ゴールド</span>
+        <span class="res-val" id="base-gold">0</span>
       </div>
-      <div class="title-menu">
-        <button class="menu-btn" id="btn-start">ゲームスタート</button>
-        <button class="menu-btn" id="btn-help">遊び方</button>
+      <div class="res-group">
+        <span class="res-label">⚡ エネルギー</span>
+        <span class="res-val" id="base-energy">0/20</span>
       </div>
-      <div class="title-deco">
-        <div class="soldier" data-team="player">🪖</div>
-        <div class="soldier" data-team="player">🪖</div>
-        <div class="soldier" data-team="player">🪖</div>
-        <div class="cannon">💣</div>
-        <div class="soldier" data-team="enemy">👹</div>
-        <div class="soldier" data-team="enemy">👹</div>
-        <div class="soldier" data-team="enemy">👹</div>
+      <div class="res-group">
+        <span class="res-label">🔬 研究P</span>
+        <span class="res-val" id="base-research">0</span>
+      </div>
+      <div class="topbar-right">
+        <button class="action-btn" id="btn-research">研究</button>
+        <button class="nav-btn" id="btn-to-map">世界マップへ ▶</button>
       </div>
     </div>
 
-    <!-- Help Screen -->
-    <div id="help-screen" class="screen">
-      <h2>遊び方</h2>
-      <ul class="help-list">
-        <li>🗺️ グリッドマップ上でターン制の戦略ゲームです</li>
-        <li>🪖 自軍（青）のユニットをクリックして選択</li>
-        <li>⬜ 移動先の緑のマスをクリックして移動</li>
-        <li>⚔️ 隣接する敵（赤）をクリックして攻撃</li>
-        <li>🏰 本拠地（★）を守りながら敵の本拠地を破壊せよ！</li>
-        <li>📜 ユニット一覧：
-          <ul>
-            <li>🪖 歩兵 - 攻撃3, 防御2, 移動2</li>
-            <li>🏹 弓兵 - 攻撃4, 防御1, 移動2, 射程2</li>
-            <li>🐴 騎兵 - 攻撃5, 防御3, 移動3</li>
-            <li>💣 砲兵 - 攻撃7, 防御1, 移動1, 射程3</li>
-          </ul>
-        </li>
-      </ul>
-      <button class="menu-btn" id="btn-help-back">戻る</button>
-    </div>
-
-    <!-- Game Screen -->
-    <div id="game-screen" class="screen">
-      <div id="top-bar">
-        <div id="player-info" class="team-info player-team">
-          <span class="team-label">🔵 自軍</span>
-          <span id="player-units-count">0</span>ユニット
-          <span class="hp-bar-wrap"><span id="player-hq-hp" class="hp-bar"></span></span>
-          本拠地HP: <span id="player-hq-hp-val">20</span>
+    <!-- コンテンツ -->
+    <div id="base-content">
+      <!-- 生産 -->
+      <div class="base-section">
+        <div class="section-header">
+          <span class="section-title">ユニット生産</span>
+          <span class="section-sub">合計戦力: <strong id="base-total-power">0</strong></span>
         </div>
-        <div id="turn-info">
-          ターン <span id="turn-num">1</span>
-          <br>
-          <span id="phase-label" class="phase-player">自軍フェーズ</span>
+        <div id="produce-btns">
+          <button class="produce-btn army-btn" id="btn-produce-army">
+            🪖 陸軍 <span class="produce-cost">5G</span>
+          </button>
+          <button class="produce-btn navy-btn" id="btn-produce-navy">
+            🚢 海軍 <span class="produce-cost">5G</span>
+          </button>
+          <button class="produce-btn air-btn" id="btn-produce-air">
+            ✈️ 空軍 <span class="produce-cost">5G</span>
+          </button>
         </div>
-        <div id="enemy-info" class="team-info enemy-team">
-          <span class="team-label">🔴 敵軍</span>
-          <span id="enemy-units-count">0</span>ユニット
-          <span class="hp-bar-wrap"><span id="enemy-hq-hp" class="hp-bar"></span></span>
-          本拠地HP: <span id="enemy-hq-hp-val">20</span>
-        </div>
+        <p class="section-hint">同レベル・同兵種をD&amp;Dで合成 → Lv UP ／ クリックで出撃ユニット選択（青枠）</p>
       </div>
 
-      <div id="map-container">
-        <canvas id="game-canvas" width="560" height="560"></canvas>
+      <!-- マージボード -->
+      <div class="base-section">
+        <div class="section-header">
+          <span class="section-title">マージボード</span>
+        </div>
+        <div id="merge-board"></div>
       </div>
 
-      <div id="bottom-bar">
-        <div id="unit-detail">
-          <span id="unit-detail-text">ユニットをクリックして選択</span>
+      <!-- 英雄 -->
+      <div class="base-section">
+        <div class="section-header">
+          <span class="section-title">英雄スロット</span>
+          <span class="section-sub">3連勝で英雄獲得</span>
         </div>
-        <div id="action-btns">
-          <button class="action-btn" id="btn-end-turn">ターン終了</button>
-        </div>
-        <div id="log-area">
-          <div id="battle-log"></div>
-        </div>
+        <div id="hero-panel"></div>
       </div>
     </div>
 
-    <!-- Result Screen -->
-    <div id="result-screen" class="screen">
-      <div id="result-content">
-        <h2 id="result-title"></h2>
-        <p id="result-message"></p>
+    <!-- ログ -->
+    <div class="log-bar">
+      <div id="base-log" class="log-content"></div>
+    </div>
+  </div>
+
+  <!-- ==================== 世界マップ ==================== -->
+  <div id="worldmap-screen" class="screen">
+    <!-- トップバー -->
+    <div class="top-bar" id="map-topbar">
+      <div class="res-group">
+        <span class="res-label">⚙️ ゴールド</span>
+        <span class="res-val" id="map-gold">0</span>
+      </div>
+      <div class="res-group">
+        <span class="res-label">⚔️ 総戦力</span>
+        <span class="res-val" id="map-power">0</span>
+      </div>
+      <div class="res-group">
+        <span class="res-label">🏳️ 占領</span>
+        <span class="res-val" id="map-progress">0/14</span>
+      </div>
+      <div class="topbar-right">
+        <button class="nav-btn back-btn" id="btn-to-base">◀ 基地へ戻る</button>
+      </div>
+    </div>
+
+    <!-- 進軍中ステータス -->
+    <div id="march-status-bar"></div>
+
+    <!-- メインエリア: キャンバス + アクションパネル -->
+    <div id="map-main">
+      <div id="canvas-wrap">
+        <canvas id="world-canvas" width="550" height="330"></canvas>
+      </div>
+      <div id="action-panel">
+        <p class="panel-hint">マップ上の領地を<br>クリックして選択</p>
+      </div>
+    </div>
+
+    <!-- ログ -->
+    <div class="log-bar">
+      <div id="map-log" class="log-content"></div>
+    </div>
+  </div>
+
+  <!-- ==================== リザルト ==================== -->
+  <div id="result-screen" class="screen">
+    <div class="result-wrap">
+      <h2 id="result-title"></h2>
+      <p id="result-message"></p>
+      <div class="result-btns">
         <button class="menu-btn" id="btn-retry">もう一度</button>
         <button class="menu-btn" id="btn-title">タイトルへ</button>
       </div>
     </div>
   </div>
 
-  <script src="game.js"></script>
+</div><!-- #app -->
+
+<!-- 研究モーダル -->
+<div id="research-modal">
+  <div id="research-content"></div>
+</div>
+
+<script src="game.js"></script>
 </body>
 </html>

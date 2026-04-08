@@ -8,96 +8,138 @@
 </head>
 <body>
   <div id="app">
-    <!-- Title Screen -->
+
+    <!-- ========== TITLE SCREEN ========== -->
     <div id="title-screen" class="screen active">
       <div class="title-logo">
-        <h1 class="title-text">ビビッド<span class="title-army">アーミー</span></h1>
-        <p class="title-sub">VIVID ARMY</p>
+        <h1 class="title-text">ビビッド<span class="accent">アーミー</span></h1>
+        <p class="title-sub">VIVID ARMY — MERGE STRATEGY</p>
       </div>
+      <div class="title-deco">🪖 💥 🚢 💥 ✈️</div>
       <div class="title-menu">
         <button class="menu-btn" id="btn-start">ゲームスタート</button>
-        <button class="menu-btn" id="btn-help">遊び方</button>
-      </div>
-      <div class="title-deco">
-        <div class="soldier" data-team="player">🪖</div>
-        <div class="soldier" data-team="player">🪖</div>
-        <div class="soldier" data-team="player">🪖</div>
-        <div class="cannon">💣</div>
-        <div class="soldier" data-team="enemy">👹</div>
-        <div class="soldier" data-team="enemy">👹</div>
-        <div class="soldier" data-team="enemy">👹</div>
+        <button class="menu-btn dim" id="btn-help">遊び方</button>
       </div>
     </div>
 
-    <!-- Help Screen -->
+    <!-- ========== HELP SCREEN ========== -->
     <div id="help-screen" class="screen">
-      <h2>遊び方</h2>
-      <ul class="help-list">
-        <li>🗺️ グリッドマップ上でターン制の戦略ゲームです</li>
-        <li>🪖 自軍（青）のユニットをクリックして選択</li>
-        <li>⬜ 移動先の緑のマスをクリックして移動</li>
-        <li>⚔️ 隣接する敵（赤）をクリックして攻撃</li>
-        <li>🏰 本拠地（★）を守りながら敵の本拠地を破壊せよ！</li>
-        <li>📜 ユニット一覧：
-          <ul>
-            <li>🪖 歩兵 - 攻撃3, 防御2, 移動2</li>
-            <li>🏹 弓兵 - 攻撃4, 防御1, 移動2, 射程2</li>
-            <li>🐴 騎兵 - 攻撃5, 防御3, 移動3</li>
-            <li>💣 砲兵 - 攻撃7, 防御1, 移動1, 射程3</li>
-          </ul>
-        </li>
-      </ul>
+      <h2 class="screen-title">遊び方</h2>
+      <div class="help-grid">
+        <div class="help-card">
+          <h3>🏭 生産・合成</h3>
+          <p>ゴールド5Gでユニット生産。同兵種・同レベルをドラッグして合成でレベルアップ！</p>
+        </div>
+        <div class="help-card">
+          <h3>⚔️ 三すくみ</h3>
+          <p>🪖陸→✈️空→🚢海→🪖陸の順で有利（×1.5）。逆は不利（×0.75）。</p>
+        </div>
+        <div class="help-card">
+          <h3>🗺️ 進軍方法</h3>
+          <p>基地でユニットをクリック選択（青枠）→「出撃！」ボタン→マップで領地クリック</p>
+        </div>
+        <div class="help-card">
+          <h3>⛏️ 採集</h3>
+          <p>占領済み領地にユニットを送ってゴールドを採集できます。</p>
+        </div>
+        <div class="help-card">
+          <h3>🔬 研究</h3>
+          <p>領地占領で研究ポイント獲得。合成レベル上限アップなどを解放しよう。</p>
+        </div>
+        <div class="help-card">
+          <h3>🏆 勝利条件</h3>
+          <p>全14の敵領地を占領するとゲームクリア！3連勝でヒーロー獲得。</p>
+        </div>
+      </div>
       <button class="menu-btn" id="btn-help-back">戻る</button>
     </div>
 
-    <!-- Game Screen -->
-    <div id="game-screen" class="screen">
-      <div id="top-bar">
-        <div id="player-info" class="team-info player-team">
-          <span class="team-label">🔵 自軍</span>
-          <span id="player-units-count">0</span>ユニット
-          <span class="hp-bar-wrap"><span id="player-hq-hp" class="hp-bar"></span></span>
-          本拠地HP: <span id="player-hq-hp-val">20</span>
-        </div>
-        <div id="turn-info">
-          ターン <span id="turn-num">1</span>
-          <br>
-          <span id="phase-label" class="phase-player">自軍フェーズ</span>
-        </div>
-        <div id="enemy-info" class="team-info enemy-team">
-          <span class="team-label">🔴 敵軍</span>
-          <span id="enemy-units-count">0</span>ユニット
-          <span class="hp-bar-wrap"><span id="enemy-hq-hp" class="hp-bar"></span></span>
-          本拠地HP: <span id="enemy-hq-hp-val">20</span>
+    <!-- ========== BASE SCREEN ========== -->
+    <div id="base-screen" class="screen">
+      <div class="res-bar">
+        <div class="res-item">💰<span id="gold-b">50</span>G</div>
+        <div class="res-item">⚡<span id="ep-b">10</span>/<span id="epm-b">20</span></div>
+        <div class="res-item">🔬<span id="rp-b">0</span>pt</div>
+        <div class="res-item streak-item">🔥<span id="sk-b">0</span>連</div>
+      </div>
+      <div class="nav-tabs">
+        <button class="tab-btn active" data-target="base-screen">🏠 基地</button>
+        <button class="tab-btn" data-target="worldmap-screen">🗺️ マップ</button>
+        <button class="tab-btn" data-target="research">🔬 研究</button>
+      </div>
+      <div id="board-wrap">
+        <div id="merge-board"></div>
+      </div>
+      <div class="prod-zone">
+        <div class="zone-label">ユニット生産</div>
+        <div class="prod-row">
+          <button class="prod-btn army" data-type="army">🪖 陸軍<br><small id="cost-a">5G</small></button>
+          <button class="prod-btn navy" data-type="navy">🚢 海軍<br><small id="cost-n">5G</small></button>
+          <button class="prod-btn airforce" data-type="airforce">✈️ 空軍<br><small id="cost-f">5G</small></button>
         </div>
       </div>
-
-      <div id="map-container">
-        <canvas id="game-canvas" width="560" height="560"></canvas>
+      <div class="hero-zone">
+        <div class="zone-label">ヒーロー <span class="dim-s">（3連勝で獲得）</span></div>
+        <div id="hero-row">
+          <div class="hero-slot empty" id="hs0">空</div>
+          <div class="hero-slot empty" id="hs1">空</div>
+          <div class="hero-slot empty" id="hs2">空</div>
+        </div>
       </div>
-
-      <div id="bottom-bar">
-        <div id="unit-detail">
-          <span id="unit-detail-text">ユニットをクリックして選択</span>
-        </div>
-        <div id="action-btns">
-          <button class="action-btn" id="btn-end-turn">ターン終了</button>
-        </div>
-        <div id="log-area">
-          <div id="battle-log"></div>
-        </div>
+      <div class="deploy-zone">
+        <span class="dim-s">ユニットをクリック選択 →</span>
+        <button class="deploy-btn" id="btn-deploy">🗺️ 出撃！</button>
       </div>
     </div>
 
-    <!-- Result Screen -->
+    <!-- ========== WORLDMAP SCREEN ========== -->
+    <div id="worldmap-screen" class="screen">
+      <div class="res-bar">
+        <div class="res-item">💰<span id="gold-m">50</span>G</div>
+        <div class="res-item">⚡<span id="ep-m">10</span>/<span id="epm-m">20</span></div>
+        <div class="res-item">🔬<span id="rp-m">0</span>pt</div>
+        <div class="res-item cyan">🏴<span id="cap-m">0</span>/14</div>
+      </div>
+      <div class="nav-tabs">
+        <button class="tab-btn" data-target="base-screen">🏠 基地</button>
+        <button class="tab-btn active" data-target="worldmap-screen">🗺️ マップ</button>
+        <button class="tab-btn" data-target="research">🔬 研究</button>
+      </div>
+      <div id="map-wrap">
+        <canvas id="world-canvas" width="550" height="330"></canvas>
+      </div>
+      <div id="march-bar"></div>
+      <div id="terr-panel">
+        <div id="terr-info">領地をクリックしてください</div>
+        <div id="terr-btns"></div>
+      </div>
+    </div>
+
+    <!-- ========== RESULT SCREEN ========== -->
     <div id="result-screen" class="screen">
-      <div id="result-content">
-        <h2 id="result-title"></h2>
-        <p id="result-message"></p>
-        <button class="menu-btn" id="btn-retry">もう一度</button>
-        <button class="menu-btn" id="btn-title">タイトルへ</button>
+      <div class="result-box">
+        <div id="res-icon"></div>
+        <h2 id="res-title"></h2>
+        <p id="res-msg"></p>
+        <div class="res-btn-row">
+          <button class="menu-btn" id="btn-retry">もう一度</button>
+          <button class="menu-btn dim" id="btn-to-title">タイトル</button>
+        </div>
       </div>
     </div>
+
+    <!-- ========== RESEARCH MODAL ========== -->
+    <div id="research-modal" class="modal-bg hidden">
+      <div class="modal-box">
+        <h2 class="modal-title">🔬 研究開発</h2>
+        <p class="modal-rp">保有ポイント: <strong id="modal-rp-val">0</strong>pt</p>
+        <div id="research-list"></div>
+        <button class="menu-btn" id="btn-research-close">閉じる</button>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast"></div>
   </div>
 
   <script src="game.js"></script>

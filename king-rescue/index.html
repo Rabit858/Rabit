@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>王様レスキュー</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- Title Screen -->
+    <div id="title-screen" class="screen active">
+      <div class="title-banner">
+        <p class="title-eyebrow">CASTLE PUZZLE</p>
+        <h1 class="title-text">王様<span class="title-accent">レスキュー</span></h1>
+        <p class="title-sub">KING RESCUE MATCH</p>
+      </div>
+      <div class="title-art">
+        <div class="title-king">🤴</div>
+        <div class="title-rocks">🪨🪨🪨</div>
+      </div>
+      <div class="title-menu">
+        <button class="menu-btn primary" id="btn-start">ゲームスタート</button>
+        <button class="menu-btn" id="btn-help">遊び方</button>
+      </div>
+    </div>
+
+    <!-- Help Screen -->
+    <div id="help-screen" class="screen">
+      <h2>遊び方</h2>
+      <ul class="help-list">
+        <li>💎 隣り合うピースを入れ替えて、同じ種類を3つ以上そろえよう</li>
+        <li>🪨 そろえるたびに岩が押し返され、ゲージが進む</li>
+        <li>⚡ 4つそろえると「ライン爆弾」、5つ以上で「範囲爆弾」が発生！</li>
+        <li>👣 手数がなくなる前にゲージを100%にすれば王様の勝ち</li>
+        <li>🔺 手数切れになると王様は岩に押しつぶされてしまう…</li>
+        <li>🔀 動かせる場所がなくなったら自動でシャッフルされます</li>
+      </ul>
+      <button class="menu-btn" id="btn-help-back">戻る</button>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen">
+      <div id="top-bar">
+        <div class="stat-box">
+          <span class="stat-label">のこり手数</span>
+          <span id="moves-val" class="stat-val">--</span>
+        </div>
+        <div id="banner-flash">思ったよりも難しい！</div>
+        <div class="stat-box">
+          <span class="stat-label">押し返し度</span>
+          <span id="pct-val" class="stat-val">0%</span>
+        </div>
+      </div>
+
+      <div id="scene">
+        <div id="wall-bg"></div>
+        <div id="spikes">
+          <div class="spike"></div>
+          <div class="spike"></div>
+          <div class="spike"></div>
+          <div class="spike"></div>
+          <div class="spike"></div>
+          <div class="spike"></div>
+          <div class="spike"></div>
+        </div>
+        <div id="king-wrap">
+          <div id="king">🤴</div>
+        </div>
+        <div id="boulder-pile"></div>
+        <div id="gauge">
+          <svg viewBox="0 0 64 64">
+            <circle class="gauge-bg" cx="32" cy="32" r="27"></circle>
+            <circle id="gauge-fg" cx="32" cy="32" r="27"></circle>
+          </svg>
+          <div id="gauge-icon">💪</div>
+        </div>
+      </div>
+
+      <div id="board-wrap">
+        <div id="board"></div>
+      </div>
+
+      <div id="toast"></div>
+    </div>
+
+    <!-- Result Screen -->
+    <div id="result-screen" class="screen">
+      <div id="result-content">
+        <h2 id="result-title"></h2>
+        <p id="result-message"></p>
+        <button class="menu-btn primary" id="btn-retry">もう一度挑戦</button>
+        <button class="menu-btn" id="btn-title">タイトルへ</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

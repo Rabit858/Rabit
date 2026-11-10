@@ -127,33 +127,65 @@
       });
     }).then(function () {
       if (!stream) return;
+      // 読むのは枠の中だけ（速く、枠の外の模様を拾わない）。同じ値が2回続けて読めたときだけ採用する（ノイズの誤読を防ぐ）
+      var canvas = document.createElement('canvas'), g = canvas.getContext('2d', { willReadFrequently: true });
+      var cropFrame = function () {
+        var W = video.clientWidth, H = video.clientHeight, vw = video.videoWidth, vh = video.videoHeight;
+        if (!W || !H || !vw || !vh) return null;
+        var sc = Math.max(W / vw, H / vh), dw = vw * sc, dh = vh * sc, ox = (W - dw) / 2, oy = (H - dh) / 2;
+        var fx = W * 0.08, fy = H * 0.38, fw = W * 0.84, fh = H * 0.24;                       // 枠（CSS と同じ割合）
+        var sx = Math.max(0, (fx - ox) / sc), sy = Math.max(0, (fy - oy) / sc), sw = Math.min(vw - sx, fw / sc), sh = Math.min(vh - sy, fh / sc);
+        var k = Math.min(1, 1000 / sw); canvas.width = Math.round(sw * k); canvas.height = Math.round(sh * k);
+        g.drawImage(video, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+        return canvas;
+      };
+      var seen = { text: '', n: 0, at: 0 };
+      var confirm = function (text) {
+        var now = Date.now();
+        if (text === seen.text && now - seen.at < 1500) seen.n++; else { seen.text = text; seen.n = 1; }
+        seen.at = now;
+        if (seen.n >= 2) { seen.n = 0; onCode(text); }
+      };
+      var FORMATS = ['code_128', 'code_39', 'qr_code', 'data_matrix'];
       var useZx = function (why) {
         if (timer) { clearTimeout(timer); timer = null; }
         st.textContent = (hasOpener ? 'ポータルと接続中・' : '') + video.videoWidth + '×' + video.videoHeight + '・ZXing' + (why ? '（' + why + '）' : '');
         lib().then(function (Z) {
           var hints = new Map();
-          try { hints.set(Z.DecodeHintType.TRY_HARDER, true); } catch (e) {}
-          zx = new Z.BrowserMultiFormatReader(hints, 120);
-          zx.decodeFromStream(stream, video, function (res) { if (res && res.getText) onCode(res.getText()); });
+          try { hints.set(Z.DecodeHintType.POSSIBLE_FORMATS, [Z.BarcodeFormat.CODE_128, Z.BarcodeFormat.CODE_39, Z.BarcodeFormat.QR_CODE, Z.BarcodeFormat.DATA_MATRIX]); } catch (e) {}
+          zx = new Z.BrowserMultiFormatReader(hints, 100);
+          var tick = function () {
+            if (!stream) return;
+            var c = video.readyState >= 2 ? cropFrame() : null;
+            if (c) {
+              try {
+                var res = zx.decodeFromCanvas ? zx.decodeFromCanvas(c) : null;
+                if (res && res.getText) confirm(res.getText());
+              } catch (e) { /* 見つからないとき */ }
+            }
+            timer = setTimeout(tick, 90);
+          };
+          tick();
         }).catch(function () { fail('読み取り用の部品を読み込めませんでした。通信を確認して、もう一度開いてください。'); });
       };
       if (window.BarcodeDetector) {
-        // 内蔵の読み取り（Android の Chrome）。形式はすべて。うまく動かない端末は ZXing に切り替える
+        // 内蔵の読み取り（Android の Chrome）。うまく動かない端末は ZXing に切り替える
         var fails = 0, ticks = 0, hit = false;
-        var mk = function () { return BarcodeDetector.getSupportedFormats ? BarcodeDetector.getSupportedFormats().then(function (f) { return new BarcodeDetector(f && f.length ? { formats: f } : undefined); }) : Promise.resolve(new BarcodeDetector()); };
+        var mk = function () { return BarcodeDetector.getSupportedFormats ? BarcodeDetector.getSupportedFormats().then(function (f) { var use = FORMATS.filter(function (x) { return !f || f.indexOf(x) !== -1; }); return new BarcodeDetector(use.length ? { formats: use } : undefined); }) : Promise.resolve(new BarcodeDetector({ formats: FORMATS })); };
         mk().then(function (d) {
           detector = d;
           var busy = false;
           var tick = function () {
             if (!stream || zx) return;
-            if (!busy && video.readyState >= 2) {
+            var c = !busy && video.readyState >= 2 ? cropFrame() : null;
+            if (c) {
               busy = true; ticks++;
-              detector.detect(video).then(function (codes) { busy = false; if (codes && codes.length) { hit = true; onCode(codes[0].rawValue); } })
+              detector.detect(c).then(function (codes) { busy = false; if (codes && codes.length) { hit = true; confirm(codes[0].rawValue); } })
                 .catch(function () { busy = false; fails++; if (fails >= 3) { useZx('内蔵が失敗'); } });
             }
             // 内蔵の読み取りが長く何も返さないときも ZXing に切り替える（Play 開発者サービスが無い端末など）
-            if (!hit && ticks >= 150 && !zx) { useZx('内蔵で読めず'); return; }
-            timer = setTimeout(tick, 120);
+            if (!hit && ticks >= 200 && !zx) { useZx('内蔵で読めず'); return; }
+            timer = setTimeout(tick, 90);
           };
           tick();
         }).catch(function () { useZx('内蔵なし'); });

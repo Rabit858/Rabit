@@ -32,6 +32,8 @@
   button:disabled { opacity: .45; }
   .big { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 24px; text-align: center; font-size: 15px; line-height: 1.7; color: #e8edf2; background: #0b0d10; }
   .big b { display: block; font-size: 18px; margin-bottom: 8px; }
+  .big[hidden], [hidden] { display: none !important; }
+  .tap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.55); font-size: 18px; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -108,11 +110,17 @@
   }
   function start() {
     $('big').hidden = true; $('again').hidden = true;
-    if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) { fail('このブラウザではカメラを使えません。'); return; }
+    st.textContent = (hasOpener ? 'ポータルと接続中・' : '') + 'カメラ許可待ち';
+    if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) { fail('このブラウザではカメラを使えません（' + location.protocol + '）。'); return; }
     navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false }).then(function (s) {
       stream = s; video.srcObject = s; track = s.getVideoTracks()[0];
+      st.textContent = (hasOpener ? 'ポータルと接続中・' : '') + 'カメラ起動';
       try { var cap = track.getCapabilities ? track.getCapabilities() : {}; if (cap.torch) $('torch').hidden = false; } catch (e) {}
-      return video.play().catch(function () {});
+      video.onloadedmetadata = function () { st.textContent = (hasOpener ? 'ポータルと接続中・' : '') + video.videoWidth + '×' + video.videoHeight + (window.BarcodeDetector ? '' : '・ZXing'); };
+      return video.play().catch(function () {
+        // 自動再生が止められたときは、タップで始める
+        return new Promise(function (ok) { var t = document.createElement('div'); t.className = 'tap'; t.textContent = 'タップしてカメラを開始'; t.onclick = function () { t.remove(); video.play().then(ok, ok); }; $('frame').parentNode.appendChild(t); });
+      });
     }).then(function () {
       if (!stream) return;
       if (window.BarcodeDetector) {

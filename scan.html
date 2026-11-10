@@ -78,8 +78,11 @@
     while (list.children.length > 30) list.removeChild(list.lastChild);
     return r;
   }
+  var RAW = '';
   function onCode(text) {
-    var no = digits(text); if (!no) return;
+    var no = digits(text);
+    if (!no) { if (text && text !== RAW) { RAW = text; msg.className = 'msg ng'; msg.textContent = '読めましたが番号（5桁以上の数字）がありません：' + String(text).slice(0, 40); } return; }
+    msg.className = 'msg';
     var now = Date.now(); if (LAST[no] && now - LAST[no] < 3000) return; LAST[no] = now;
     frame.classList.add('hit'); setTimeout(function () { frame.classList.remove('hit'); }, 350);
     beep();
@@ -112,8 +115,9 @@
     $('big').hidden = true; $('again').hidden = true;
     st.textContent = (hasOpener ? 'ポータルと接続中・' : '') + 'カメラ許可待ち';
     if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) { fail('このブラウザではカメラを使えません（' + location.protocol + '）。'); return; }
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false }).then(function (s) {
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false }).then(function (s) {
       stream = s; video.srcObject = s; track = s.getVideoTracks()[0];
+      try { track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] }).catch(function () {}); } catch (e) {}
       st.textContent = (hasOpener ? 'ポータルと接続中・' : '') + 'カメラ起動';
       try { var cap = track.getCapabilities ? track.getCapabilities() : {}; if (cap.torch) $('torch').hidden = false; } catch (e) {}
       video.onloadedmetadata = function () { st.textContent = (hasOpener ? 'ポータルと接続中・' : '') + video.videoWidth + '×' + video.videoHeight + (window.BarcodeDetector ? '' : '・ZXing'); };
@@ -123,23 +127,37 @@
       });
     }).then(function () {
       if (!stream) return;
-      if (window.BarcodeDetector) {
-        detector = detector || new BarcodeDetector({ formats: ['code_128', 'code_39', 'ean_13', 'itf', 'codabar', 'qr_code'] });
-        var busy = false;
-        var tick = function () {
-          if (!stream) return;
-          if (!busy && video.readyState >= 2) { busy = true; detector.detect(video).then(function (codes) { busy = false; if (codes && codes.length) onCode(codes[0].rawValue); }).catch(function () { busy = false; }); }
-          timer = setTimeout(tick, 120);
-        };
-        tick();
-      } else {
+      var useZx = function (why) {
+        if (timer) { clearTimeout(timer); timer = null; }
+        st.textContent = (hasOpener ? 'ポータルと接続中・' : '') + video.videoWidth + '×' + video.videoHeight + '・ZXing' + (why ? '（' + why + '）' : '');
         lib().then(function (Z) {
           var hints = new Map();
-          try { hints.set(Z.DecodeHintType.TRY_HARDER, true); hints.set(Z.DecodeHintType.POSSIBLE_FORMATS, [Z.BarcodeFormat.CODE_128, Z.BarcodeFormat.CODE_39, Z.BarcodeFormat.ITF, Z.BarcodeFormat.EAN_13, Z.BarcodeFormat.CODABAR, Z.BarcodeFormat.QR_CODE]); } catch (e) {}
-          zx = new Z.BrowserMultiFormatReader(hints, 150);
+          try { hints.set(Z.DecodeHintType.TRY_HARDER, true); } catch (e) {}
+          zx = new Z.BrowserMultiFormatReader(hints, 120);
           zx.decodeFromStream(stream, video, function (res) { if (res && res.getText) onCode(res.getText()); });
         }).catch(function () { fail('読み取り用の部品を読み込めませんでした。通信を確認して、もう一度開いてください。'); });
-      }
+      };
+      if (window.BarcodeDetector) {
+        // 内蔵の読み取り（Android の Chrome）。形式はすべて。うまく動かない端末は ZXing に切り替える
+        var fails = 0, ticks = 0, hit = false;
+        var mk = function () { return BarcodeDetector.getSupportedFormats ? BarcodeDetector.getSupportedFormats().then(function (f) { return new BarcodeDetector(f && f.length ? { formats: f } : undefined); }) : Promise.resolve(new BarcodeDetector()); };
+        mk().then(function (d) {
+          detector = d;
+          var busy = false;
+          var tick = function () {
+            if (!stream || zx) return;
+            if (!busy && video.readyState >= 2) {
+              busy = true; ticks++;
+              detector.detect(video).then(function (codes) { busy = false; if (codes && codes.length) { hit = true; onCode(codes[0].rawValue); } })
+                .catch(function () { busy = false; fails++; if (fails >= 3) { useZx('内蔵が失敗'); } });
+            }
+            // 内蔵の読み取りが長く何も返さないときも ZXing に切り替える（Play 開発者サービスが無い端末など）
+            if (!hit && ticks >= 150 && !zx) { useZx('内蔵で読めず'); return; }
+            timer = setTimeout(tick, 120);
+          };
+          tick();
+        }).catch(function () { useZx('内蔵なし'); });
+      } else useZx('');
     }).catch(function (e) {
       var name = e && e.name || '';
       fail(name === 'NotAllowedError' ? 'カメラの使用が許可されていません。ブラウザの設定でこのサイトのカメラを許可して、もう一度「カメラを起動」を押してください。' : 'カメラを起動できませんでした（' + (name || 'エラー') + '）。');
